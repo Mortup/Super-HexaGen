@@ -9,6 +9,7 @@ import GameMath
 import pygame
 import math
 import MusicManager
+import NeuralInterface
 
 
 # The player Drawable object
@@ -23,9 +24,13 @@ class Player(Drawable):
         Drawable.__init__(self, 100, 3*math.pi/2, 0, [(-10, -10), (-10, 10), (9, 0)], 3)
 
     def update(self):
+        self.move_with_network()
         self.move()
         self.set_rotation()
         self.check_collisions()
+
+    def move_with_network(self):
+        NeuralInterface.feed(Obstacle.current_obstacles, self.y)
 
     def move(self):
         # Modify current_speed
