@@ -25,21 +25,21 @@ class Player(Drawable):
 
     def update(self):
         self.move_with_network()
-        self.move()
+        self.move(pygame.key.get_pressed()[pygame.K_LEFT], pygame.key.get_pressed()[pygame.K_RIGHT])
         self.set_rotation()
         self.check_collisions()
 
     def move_with_network(self):
         NeuralInterface.feed(Obstacle.current_obstacles, self.y)
 
-    def move(self):
+    def move(self, leftPressed, rightPressed):
         # Modify current_speed
         is_moving = False
-        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+        if rightPressed:
             is_moving = True
             self.current_speed += self.acceleration
 
-        if pygame.key.get_pressed()[pygame.K_LEFT]:
+        if leftPressed:
             is_moving = True
             self.current_speed -= self.acceleration
 
