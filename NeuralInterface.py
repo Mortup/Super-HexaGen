@@ -1,8 +1,8 @@
 import math
 
-def feed(obstacles, player_pos):
-    print get_space_vector(obstacles)
-    print player_pos
+def feed(obstacles, player_angle, player_height):
+    close_obs = get_closer_obstacles(obstacles, 100, player_height)
+    return find_direction(close_obs, player_angle)
 
 # Devuelve el vector que indica que posiciones
 # estan vacias y cuales tienen un obstaculo.
@@ -31,4 +31,65 @@ def get_space_vector(obstacles):
         result.append(r)
 
     return result
+
+
+def get_closer_obstacles(obstacles, delta, player_pos):
+    if obstacles == None or len(obstacles) == 0:
+        return []
+
+    closer = None
+
+    for obs in obstacles:
+        if obs.vert_mag > player_pos - 3:
+            if closer == None:
+                closer = obs
+            elif obs.vert_mag < closer.vert_mag:
+                closer = obs
+
+
+    if closer == None:
+        return []
+
+    close_obs = []
+    closer_mag = closer.vert_mag
+    for obs in obstacles:
+        if closer.vert_mag - 10 <= obs.vert_mag <= closer.vert_mag + delta:
+            close_obs.append(obs)
+
+    return close_obs
+
+def find_direction(obstacles, player_angle):
+    should_move = False
+
+    for obs in obstacles:
+        if obs.is_on_angle(player_angle):
+            should_move = True
+            break
+
+    if not should_move:
+        return [False, False]
+
+    steps = 13
+    for i in range(steps):
+        delta_angle = math.pi * 2.0 / steps
+        left_angle = (player_angle - delta_angle*i)%(math.pi*2)
+        right_angle = (player_angle + delta_angle*i)%(math.pi*2)
+
+        left_empty = True
+        right_empty = True
+        for obs in obstacles:
+            if obs.is_on_angle(left_angle):
+                left_empty = False
+            if obs.is_on_angle(right_angle):
+                right_empty = False
+
+        if left_empty:
+            return [True, False]
+        if right_empty:
+            return [False, True]
+
+    return [True, False]
+
+
+
 

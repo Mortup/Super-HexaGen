@@ -4,15 +4,6 @@ from Menu_Objects import *
 import Settings
 from GameManager import GameManager
 
-pygame.mixer.pre_init(44100, -16, 1, 512)
-pygame.init()
-screen = pygame.display.set_mode((Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT))
-done = False
-
-clock = pygame.time.Clock()
-
-clock.tick(3)
-
 
 def load_main_menu(screen):
     scene = Scene(screen)
@@ -55,7 +46,7 @@ def load_main_menu(screen):
 
     return scene
 
-def load_game_scene(screen, index):
+def load_game_scene(screen, index, player_ai=None):
     scene = Scene(screen)
 
     GameManager.currentLevelIndex = index
@@ -75,7 +66,7 @@ def load_game_scene(screen, index):
     scene.add_gameobject(BackgroundBar(2))
     scene.add_gameobject(BackgroundBar(1))
     scene.add_gameobject(BackgroundBar(0))
-    scene.add_gameobject(Player())
+    scene.add_gameobject(Player(player_ai))
     scene.add_gameobject(CenterPolygon(False))
     scene.add_gameobject(CenterPolygon(True))
 
@@ -122,43 +113,106 @@ def load_death_screen(screen):
 
     return scene
 
-current_scene = load_main_menu(screen)
-
-last_pressed_r = 0
-while not done:
-    # Close with the pygame event
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+def play_level(level_index, ai_fun=None):
+    pygame.mixer.pre_init(44100, -16, 1, 512)
+    pygame.init()
+    screen = pygame.display.set_mode((Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT))
+    done = False
+    
+    clock = pygame.time.Clock()
+    
+    clock.tick(3)
+    
+    current_scene = load_game_scene(screen, level_index, ai_fun)
+    
+    time_elapsed = 0.0
+    while not GameManager.is_game_over and not GameManager.should_load_win:
+        # Close with the pygame event
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+    
+        # Close when the player hits esc
+        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             done = True
+    
+        if (GameManager.is_game_over):
+            current_scene = load_death_screen(screen)
+            GameManager.is_game_over = False
+    
+        if not MenuManager.level_to_load == -1:
+            index = MenuManager.level_to_load
+            MenuManager.level_to_load = -1
+            current_scene = load_game_scene(screen, index)
+    
+        if MenuManager.should_load_menu:
+            current_scene = load_main_menu(screen)
+            MenuManager.should_load_menu = False
+    
+        if GameManager.should_load_win:
+            current_scene = load_win_screen(screen)
+            GameManager.should_load_win = False
+    
+        last_pressed_r = pygame.key.get_pressed()[pygame.K_r]
+    
+        screen.fill((0,0,0))
+        current_scene.update()
+    
+        pygame.display.flip()
+        clock.tick(Settings.FPS)
+        time_elapsed += Settings.FPS
 
-    # Close when the player hits esc
-    if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-        done = True
+    return time_elapsed
+    
 
-    if (pygame.key.get_pressed()[pygame.K_r] and last_pressed_r == 0):
-        current_scene = load_game_scene(screen, GameManager.currentLevelIndex)
-
-    if (GameManager.is_game_over):
-        current_scene = load_death_screen(screen)
-        GameManager.is_game_over = False
-
-    if not MenuManager.level_to_load == -1:
-        index = MenuManager.level_to_load
-        MenuManager.level_to_load = -1
-        current_scene = load_game_scene(screen, index)
-
-    if MenuManager.should_load_menu:
-        current_scene = load_main_menu(screen)
-        MenuManager.should_load_menu = False
-
-    if GameManager.should_load_win:
-        current_scene = load_win_screen(screen)
-        GameManager.should_load_win = False
-
-    last_pressed_r = pygame.key.get_pressed()[pygame.K_r]
-
-    screen.fill((0,0,0))
-    current_scene.update()
-
-    pygame.display.flip()
-    clock.tick(Settings.FPS)
+if __name__ == '__main__':
+    pygame.mixer.pre_init(44100, -16, 1, 512)
+    pygame.init()
+    screen = pygame.display.set_mode((Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT))
+    done = False
+    
+    clock = pygame.time.Clock()
+    
+    clock.tick(3)
+    
+    current_scene = load_main_menu(screen)
+    
+    last_pressed_r = 0
+    while not done:
+        # Close with the pygame event
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+    
+        # Close when the player hits esc
+        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            done = True
+    
+        if (pygame.key.get_pressed()[pygame.K_r] and last_pressed_r == 0):
+            current_scene = load_game_scene(screen, GameManager.currentLevelIndex)
+    
+        if (GameManager.is_game_over):
+            current_scene = load_death_screen(screen)
+            GameManager.is_game_over = False
+    
+        if not MenuManager.level_to_load == -1:
+            index = MenuManager.level_to_load
+            MenuManager.level_to_load = -1
+            current_scene = load_game_scene(screen, index)
+    
+        if MenuManager.should_load_menu:
+            current_scene = load_main_menu(screen)
+            MenuManager.should_load_menu = False
+    
+        if GameManager.should_load_win:
+            current_scene = load_win_screen(screen)
+            GameManager.should_load_win = False
+    
+        last_pressed_r = pygame.key.get_pressed()[pygame.K_r]
+    
+        screen.fill((0,0,0))
+        current_scene.update()
+    
+        pygame.display.flip()
+        clock.tick(Settings.FPS)
+    

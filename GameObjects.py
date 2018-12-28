@@ -9,7 +9,6 @@ import GameMath
 import pygame
 import math
 import MusicManager
-import NeuralInterface
 
 
 # The player Drawable object
@@ -20,17 +19,20 @@ class Player(Drawable):
     drag = 0.7
     max_movement_rotation = 50 * math.pi / 180
 
-    def __init__(self):
+    def __init__(self, input_fun):
         Drawable.__init__(self, 100, 3*math.pi/2, 0, [(-10, -10), (-10, 10), (9, 0)], 3)
 
+        self.input_fun = input_fun
+
     def update(self):
-        self.move_with_network()
-        self.move(pygame.key.get_pressed()[pygame.K_LEFT], pygame.key.get_pressed()[pygame.K_RIGHT])
+        if self.input_fun == None:
+            keys = [pygame.key.get_pressed()[pygame.K_LEFT], pygame.key.get_pressed()[pygame.K_RIGHT]]
+        else:
+            keys = self.input_fun(Obstacle.current_obstacles, self.y, self.x)
+
+        self.move(keys[0], keys[1])
         self.set_rotation()
         self.check_collisions()
-
-    def move_with_network(self):
-        NeuralInterface.feed(Obstacle.current_obstacles, self.y)
 
     def move(self, leftPressed, rightPressed):
         # Modify current_speed
