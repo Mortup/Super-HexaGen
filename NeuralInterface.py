@@ -1,9 +1,4 @@
 import math
-
-def feed(obstacles, player_angle, player_height):
-    close_obs = get_closer_obstacles(obstacles, 100, player_height)
-    return find_direction(close_obs, player_angle)
-
 # Devuelve el vector que indica que posiciones
 # estan vacias y cuales tienen un obstaculo.
 def get_space_vector(obstacles):
