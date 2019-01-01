@@ -1,9 +1,9 @@
+import random
 from JuiceManager import *
 from GameObjects import *
 from Menu_Objects import *
 import Settings
 from GameManager import GameManager
-
 
 def load_main_menu(screen):
     scene = Scene(screen)
@@ -114,6 +114,7 @@ def load_death_screen(screen):
     return scene
 
 def play_level(level_index, ai_fun=None):
+    random.seed(42)
     pygame.mixer.pre_init(44100, -16, 1, 512)
     pygame.init()
     screen = pygame.display.set_mode((Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT))

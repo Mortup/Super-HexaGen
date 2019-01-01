@@ -1,7 +1,6 @@
 import random
 import Colors
 
-
 # Pauta o guion con los cambios de velocidad de camara y de intensidad de zoom de cada nivel
 class Pattern:
 
