@@ -2,6 +2,7 @@ import random
 import numpy as np
 from NeuralInterface import *
 f = open("datos.txt", "w")
+f.write('generacion;fitness;pesos;bias')
 class GeneticAlgorithm:
     def __init__(self, fitnessFun, popGenerator, childGenerator, mutationChance, popSize, stopCondition):
         self.fitnessFun = fitnessFun
@@ -13,8 +14,7 @@ class GeneticAlgorithm:
 
     def tournament_selection(self):
         best = None
-        for i in range(1, 5):
-            print("Torneo numero "+str(i))
+        for i in range(1, int(len(self.population)/4)):
             ind = self.population[random.randint(0, self.popSize - 1)]
             if ((best == None) or self.fitnessFun(ind) > self.fitnessFun(best)):
                 best = ind
@@ -46,7 +46,9 @@ class GeneticAlgorithm:
             maxFitness = max(new_fitnesses)
             print(maxFitness)
             maxArg = np.argmax(new_fitnesses)
-            f.write(str(generacion)+';'+str(maxFitness)+';'+str(self.population[maxArg].getWeights())+'\n')
+            print("Mostrando el mejor de la generacion "+str(generacion))
+            self.fitnessFun(self.population[maxArg], True)
+            f.write(str(generacion)+';'+str(maxFitness)+';'+str(self.population[maxArg].getWeights())+';'+str(self.population[maxArg].getBias())+'\n')
             if (not self.stopCondition(maxFitness)):
                 print(self.population[maxArg].getWeights())
                 return self.population[maxArg]
@@ -236,3 +238,9 @@ class NeuralNetwork():
                 pesos.append(neuron.getWeights())
         return pesos
 
+    def getBias(self):
+        bias = []
+        for layer in self.layers:
+            for neuron in layer.getNeurons():
+                bias.append(neuron.getBias())
+        return bias

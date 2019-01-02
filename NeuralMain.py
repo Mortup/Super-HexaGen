@@ -37,19 +37,21 @@ def stopCondition(fitness):
   else:
     return True
 
-def fitness(red):
+def fitness(red, forceShow=False):
     def feed(obstacles, player_angle, player_height):
         close_obs = get_closer_obstacles(obstacles, 100, player_height)
         input = get_space_vector(close_obs)+[player_angle/(2*math.pi)]
         return red.feed(input)
     weights = str(red.getWeights())
+    if forceShow:
+        Main.play_level(0, feed)
     if weights in fitnessMap.keys():
-      return fitnessMap[weights]
+        return fitnessMap[weights]
     else:
-      fitnessRed = Main.play_level(0, feed)
-      fitnessMap[weights] = fitnessRed
-      return fitnessRed
+        fitnessRed = Main.play_level(0, feed)
+        fitnessMap[weights] = fitnessRed
+        return fitnessRed
 
 fitnessMap.clear()
-alg = GeneticAlgorithm(fitness,crearPoblacion,tenerHijo,0.25,50, stopCondition)
+alg = GeneticAlgorithm(fitness,crearPoblacion,tenerHijo,0.02,200, stopCondition)
 alg.run()
