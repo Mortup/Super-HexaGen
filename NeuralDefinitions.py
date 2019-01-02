@@ -1,6 +1,7 @@
 import random
 import numpy as np
 from NeuralInterface import *
+f = open("datos.txt", "w")
 class GeneticAlgorithm:
     def __init__(self, fitnessFun, popGenerator, childGenerator, mutationChance, popSize, stopCondition):
         self.fitnessFun = fitnessFun
@@ -12,7 +13,8 @@ class GeneticAlgorithm:
 
     def tournament_selection(self):
         best = None
-        for i in range(1, int(len(self.population) / 2)):
+        for i in range(1, 5):
+            print("Torneo numero "+str(i))
             ind = self.population[random.randint(0, self.popSize - 1)]
             if ((best == None) or self.fitnessFun(ind) > self.fitnessFun(best)):
                 best = ind
@@ -21,6 +23,7 @@ class GeneticAlgorithm:
     def selection(self):
         adecuar = []
         for i in range(0, 2 * self.popSize):
+            print("Seleccionando mejores individuos "+str(i))
             adecuar.append(self.tournament_selection())
         return adecuar
 
@@ -38,11 +41,12 @@ class GeneticAlgorithm:
                 self.population.append(child)
             new_fitnesses = []
             for i in range(0, len(self.population)):
-                print("Procesando red "+str(i+1))
+                print("Testeando hijo "+str(i+1))
                 new_fitnesses.append(self.fitnessFun(self.population[i]))
             maxFitness = max(new_fitnesses)
             print(maxFitness)
             maxArg = np.argmax(new_fitnesses)
+            f.write(str(generacion)+';'+str(maxFitness)+';'+str(self.population[maxArg].getWeights())+'\n')
             if (not self.stopCondition(maxFitness)):
                 print(self.population[maxArg].getWeights())
                 return self.population[maxArg]

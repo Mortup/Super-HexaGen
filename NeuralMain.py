@@ -3,7 +3,9 @@ import Main
 
 from NeuralDefinitions import *
 import random
+from datetime import datetime
 
+fitnessMap = {}
 def crearPoblacion(N):
   poblacion=[]
   for i in range(0,N):
@@ -12,6 +14,7 @@ def crearPoblacion(N):
   return poblacion
 
 def tenerHijo(padre1,padre2, mutationRate):
+  random.seed(datetime.now())
   randomIndex = random.randint(0,16)
   childWeights = padre1.getFirstWeightsBias(randomIndex)[0]+padre2.getLastWeightsBias(randomIndex)[0]
   childBias = padre1.getFirstWeightsBias(randomIndex)[1]+padre2.getLastWeightsBias(randomIndex)[1]
@@ -29,7 +32,7 @@ def tenerHijo(padre1,padre2, mutationRate):
   return child
 
 def stopCondition(fitness):
-  if fitness>=1000000:
+  if fitness>=500000:
     return False
   else:
     return True
@@ -39,7 +42,14 @@ def fitness(red):
         close_obs = get_closer_obstacles(obstacles, 100, player_height)
         input = get_space_vector(close_obs)+[player_angle/(2*math.pi)]
         return red.feed(input)
-    return Main.play_level(0, feed)
+    weights = str(red.getWeights())
+    if weights in fitnessMap.keys():
+      return fitnessMap[weights]
+    else:
+      fitnessRed = Main.play_level(0, feed)
+      fitnessMap[weights] = fitnessRed
+      return fitnessRed
 
-alg = GeneticAlgorithm(fitness,crearPoblacion,tenerHijo,0.10,100, stopCondition)
+fitnessMap.clear()
+alg = GeneticAlgorithm(fitness,crearPoblacion,tenerHijo,0.25,5, stopCondition)
 alg.run()
