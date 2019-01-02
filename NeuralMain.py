@@ -51,5 +51,5 @@ def fitness(red):
       return fitnessRed
 
 fitnessMap.clear()
-alg = GeneticAlgorithm(fitness,crearPoblacion,tenerHijo,0.25,5, stopCondition)
+alg = GeneticAlgorithm(fitness,crearPoblacion,tenerHijo,0.25,50, stopCondition)
 alg.run()
