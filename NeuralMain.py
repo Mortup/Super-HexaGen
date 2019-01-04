@@ -7,6 +7,7 @@ from datetime import datetime
 
 fitnessMap = {}
 def crearPoblacion(N):
+  random.seed(datetime.now())
   poblacion=[]
   for i in range(0,N):
     red = NeuralNetwork(7,(15,),2)

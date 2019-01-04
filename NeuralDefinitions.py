@@ -1,8 +1,9 @@
 import random
 import numpy as np
 from NeuralInterface import *
+from datetime import datetime
 f = open("datos.txt", "w")
-f.write('generacion;fitness;pesos;bias')
+f.write('generacion;fitness;pesos;bias\n')
 class GeneticAlgorithm:
     def __init__(self, fitnessFun, popGenerator, childGenerator, mutationChance, popSize, stopCondition):
         self.fitnessFun = fitnessFun
@@ -30,6 +31,7 @@ class GeneticAlgorithm:
     def run(self):
         generacion = 0
         while (True):
+            random.seed(datetime.now())
             generacion += 1
             print("Procesando generacion " + str(generacion))
             new_pop = self.selection()
